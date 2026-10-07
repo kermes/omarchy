@@ -37,15 +37,8 @@ else
       exit 1
       ;;
     *microsoft*)
-      # "Microsoft Corporation" is also the BIOS vendor of Hyper-V Gen 2 virtual
-      # machines, which run no Surface firmware and have no reason to be refused.
-      # Narrow it with the product identifiers: real hardware reports
-      # product_name "Surface Go" / "Surface Pro 7" and product_family "Surface",
-      # while a Hyper-V guest reports "Virtual Machine" for both.
-      product_name=$(cat /sys/class/dmi/id/product_name 2>/dev/null)
-      product_family=$(cat /sys/class/dmi/id/product_family 2>/dev/null)
-
-      if [[ ${product_name,,} == surface* || ${product_family,,} == surface* ]]; then
+      # Hyper-V guests share this BIOS vendor, so refuse only Surface hardware.
+      if omarchy-hw-surface; then
         echo "Error: Surface firmware manages its own boot order and may drop custom EFI entries" >&2
         exit 1
       fi
